@@ -236,7 +236,7 @@ unsigned char CRC_Calc(unsigned char mass[], unsigned char mass_size, unsigned c
 
 char Read_ROM64(char *family_code, char ser_num[], char *crc){
 	unsigned char tmp_array[8];
-	unsigned char crc_value = 0;
+	unsigned char crc_calculated = 0;
 	char err_code = 0;
 	if(!Start_1wire()){			// 1-wire device found
 		WriteByte_1wire(READ_ROM);
@@ -259,10 +259,11 @@ char Read_ROM64(char *family_code, char ser_num[], char *crc){
 		}
 		printf("\n==== CRC Rx = 0x%X \n", tmp_array[7]);
 
-		crc_value = CRC_Calc(tmp_array, 7, CRC_POLYNOM);
-		printf("==== CRC calculated = 0x%X \n" , crc_value);
+		crc_calculated = CRC_Calc(tmp_array, 7, CRC_POLYNOM);
+		printf("==== CRC calculated = 0x%X \n" , crc_calculated);
 		
-		return 0;
+		if(crc_calculated == tmp_array[7]) return 0;
+		else return 1;	// return 2; ?? error ROM64 read  
 	}
 	else{
 		return 1;				// error. 1-wire device are not found
