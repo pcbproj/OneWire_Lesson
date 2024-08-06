@@ -10,7 +10,8 @@
 
 #include "stm32f4xx.h"
 
-#define SENSOR_CHECK_TIME_US	1000000	// 1_000_000 us = 1 s
+//#define SENSOR_CHECK_TIME_US	1000000	// 1_000_000 us = 1 s
+#define SENSOR_CHECK_TIME_US	300000	// 300_000 us = 300 ms
 
 // --------- 1 wire подстановки для лучшей читабельности кода -------
 #define release_1wire()		(GPIOE -> BSRR |= GPIO_BSRR_BS2)	// для этого конфигурировать выход в режиме open-drain
@@ -33,6 +34,11 @@
 #define CONVERT_T		0x44
 #define RECALL_E2		0xB8
 #define READ_PWR		0xB4
+
+//-------- 1-wire ERROR codes ---------------
+#define OK_1WIRE		0
+#define NO_DEVICE_1WIRE	1
+#define CRC_ERR_1WIRE	2
 
 //--------- параметры вычисления CRC для DS18B20 --------
 #define CRC_POLYNOM		(char)0x31	// BIN = 1_0011_0001 берем младшие 8 бит
@@ -262,11 +268,11 @@ char Read_ROM64(char *family_code, char ser_num[], char *crc){
 		crc_calculated = CRC_Calc(tmp_array, 7, CRC_POLYNOM);
 		printf("==== CRC calculated = 0x%X \n" , crc_calculated);
 		
-		if(crc_calculated == tmp_array[7]) return 0;
-		else return 1;	// return 2; ?? error ROM64 read  
+		if(crc_calculated == tmp_array[7]) return OK_1WIRE;
+		else return CRC_ERR_1WIRE;	// error ROM64 read  
 	}
 	else{
-		return 1;				// error. 1-wire device are not found
+		return NO_DEVICE_1WIRE;			// error. 1-wire device are not found
 	}
 
 }
@@ -283,10 +289,10 @@ char ReadScratchpad(char scratch_array[]){
 			scratch_array[i] = ReadByte_1wire();
 			Delay_us(100);
 		}						
-		return 0;
+		return OK_1WIRE;
 	}
 	else{
-		return 1;
+		return NO_DEVICE_1WIRE;
 	}
 }
 
@@ -302,14 +308,31 @@ char Convert_Temperature(void){
 		Delay_us(100);
 		WriteByte_1wire(CONVERT_T);
 		Delay_us(100);
-		return 0;
+		return OK_1WIRE;
 	}
 	else{
-		return 1;
+		return NO_DEVICE_1WIRE;
 	}
 }
 
 
+char WriteScratch(char tx_array[]){	// write only 3 byties from array [0 1 2 ] will be writed
+	if(!Start_1wire()){			// 1-wire device found
+		WriteByte_1wire(SKIP_ROM);
+		Delay_us(100);
+		WriteByte_1wire(WRITE_SCRATCH);
+		Delay_us(100);
+		for(char i = 0; i < 3; i++){		// write only 3 byties from tx_array 
+			WriteByte_1wire(tx_array[i]);
+			Delay_us(100);
+		}	
+		Start_1wire();		// final reset pulse					
+		return OK_1WIRE;
+	}
+	else{
+		return NO_DEVICE_1WIRE;
+	}
+}
 
 
 
@@ -355,7 +378,7 @@ int main(void){
 	
 	while(1){
 		error_1wire = Read_ROM64(&family_byte, ser_number, &crc_rx);
-		if( !error_1wire ){
+		if( error_1wire == OK_1WIRE ){
 			
 			printf("+++ DS18B20 found +++ \n");
 			printf("+++ FAMILY_CODE = %X \n", family_byte);
@@ -365,12 +388,19 @@ int main(void){
 				printf("%X ", ser_number[i]);
 			}
 			printf("\n");
-			printf("+++ CRC RX = %X \n", crc_rx);
+			//printf("+++ CRC RX = %X \n", crc_rx);
 
 		}
 		else{
 			printf("---- ERROR: 1-Wire DS18B20 not found \n");
 		}
+		
+		//------- CONFIG settings for DS18B20 ----------
+		scratch_mem[0] = 0x64;			// TH = 0x64 = 100	 
+		scratch_mem[1] = 0x0A;			// TL = 0x0A = 10
+		scratch_mem[2] = 0x1F;			// CONFIG = 0x1F; 9-bit temperature format
+		
+		WriteScratch(scratch_mem);	// write config scratchpad 
 
 		Convert_Temperature(); // convert_t
 
@@ -378,7 +408,7 @@ int main(void){
 		us_count = 0;
 		
 		error_1wire = ReadScratchpad(scratch_mem);
-		if(!error_1wire){
+		if(error_1wire == OK_1WIRE){
 
 			if(scratch_mem[1] < 0x04){	// если положительные температуры
 				temper = ((scratch_mem[1] << 8 ) & 0x0700) + scratch_mem[0];
