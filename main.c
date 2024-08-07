@@ -45,6 +45,17 @@
 #define CRC_LEN_8_BITS		8
 
 
+#define ROM64_ZERO_BITS_CONDITION	0x01
+#define ROM64_ONE_BITS_CONDITION	0x02
+#define ROM64_DIFF_BITS_CONDITION	0x00
+#define ROM64_NO_DEVICE_CONDITION	0x03
+
+#define ROM64_BITS_CONDITION_MASK	0x03
+
+
+
+
+
 
 uint32_t us_count = 0;
 uint32_t delay_us_count = 0;
@@ -152,6 +163,42 @@ char Start_1wire(void){	// функция начала транзакции 1-wi
 		return 0;	// received presence pulse from 1-wire device
 	}
 }
+
+
+void WriteBit(char bit){	
+	tx_mode_1wire();
+	pull_low_1wire();
+	Delay_us(5);
+	if(bit != 0){
+		release_1wire();
+	}
+	Delay_us(55);		// write bit slot time = 60 us
+	rx_mode_1wire();
+}
+
+
+
+
+char ReadBit(void){	
+	char bit = 0;
+	tx_mode_1wire();
+	pull_low_1wire();
+	Delay_us(2);
+	release_1wire();
+	rx_mode_1wire();
+	Delay_us(12);
+	
+	if(check_1wire()) bit = 1;	// if received one
+	else bit = 0;				// if receive zero
+
+	Delay_us(60-14);	// read bit slot time = 60 us
+	tx_mode_1wire();
+	release_1wire();
+	Delay_us(2);		// пауза между битами 2 мкс
+	return bit;
+}
+
+
 
 
 
@@ -277,6 +324,90 @@ char Read_ROM64(char *family_code, char ser_num[], char *crc){
 
 }
 
+// функция сканирования шины 1wire для поиска всех идентификаторов устройств
+/*
+	первым находит устройство с минимальным значением кода ROM64
+	сортировка устройств по возрастанию кода ROM64 
+*/
+
+char SearchROM(char ROM64_array_prev[],	// массив char ROM_64[8] с предыдущим значением
+				char ROM64_array[],		//  массив char ROM_64[8] с новым значением
+				char branches[]			// массив с разночтениями: 1 - разночтение в позиции бита, 0 - нет разночтений.
+				){
+	uint8_t const ROM64_BITS_NUMBER = 64;
+	//uint8_t const ROM64_ZERO_BITS_CONDITION = 0x01;
+	//uint8_t const ROM64_ONE_BITS_CONDITION = 0x02;
+	//uint8_t const ROM64_DIFF_BITS_CONDITION = 0x00;
+	//uint8_t const ROM64_NO_DEVICE_CONDITION = 0x03;
+	//uint8_t const ROM64_BITS_CONDITION_MASK = 0x03;
+
+
+	char rx_bits = 0;
+	char rx_byte_val = 0; 
+	char byte_number = 0; 
+	char bit_num = 0;
+	char byte_branches = 0;
+
+	if(!Start_1wire()){	
+		WriteByte_1wire(SEARCH_ROM);
+		printf("======= Searching ROM.... \n");
+		printf("========================== \n");
+		Delay_us(100);
+		
+		for(uint8_t i = 0; i < ROM64_BITS_NUMBER; i++){
+			byte_number = i / 8;
+			bit_num = i % 8;
+			rx_bits = 0x00;		// clear rx_bits
+
+			if(bit_num == 0) {
+				byte_branches = 0;	// clear byte_branches for next byte
+				rx_byte_val = 0;	// clear rx byte value
+			}
+
+			if(ReadBit()) rx_bits |= (1 << 1);	// read bit value
+			
+			if(ReadBit()) rx_bits |= (1 << 0);	// read bit NOT_value
+			
+			switch(rx_bits & ROM64_BITS_CONDITION_MASK) {
+			case ROM64_ZERO_BITS_CONDITION:
+				WriteBit(0);
+				break;
+
+			case ROM64_ONE_BITS_CONDITION:
+				rx_byte_val |= (1 << bit_num);
+				ROM64_array[byte_number] = rx_byte_val;
+				WriteBit(1);
+				break;
+
+			case ROM64_DIFF_BITS_CONDITION:
+				byte_branches |= (1 << bit_num);
+				branches[byte_number] = byte_branches;
+				if(ROM64_array_prev[byte_number] & (1 << bit_num)){	// !!!!!!!!
+					WriteBit(0);	// send inverted bit value in diffenent readed bit
+				}
+				else{
+					WriteBit(1);	// send inverted bit value in diffenent readed bit
+				}
+				break;
+
+			case ROM64_NO_DEVICE_CONDITION:
+				return NO_DEVICE_1WIRE;
+				//NULL;
+				break;
+		
+			
+			}	// switch (ROM64_BITS_CONDITION_MASK)
+		
+		
+		//printf("bit_num = %d, \t byte_num = %d, \t rx_bits = 0x%X, \t rx_byte_val = 0x%X \n", 
+		//		bit_num,		byte_number,		rx_bits,		rx_byte_val);
+
+		}	// for ROM64_BITS_NUMBER
+
+		return OK_1WIRE;
+	}
+}
+
 char ReadScratchpad(char scratch_array[]){
 	char err_code = 0;
 	uint16_t temp = 0;
@@ -359,6 +490,10 @@ int main(void){
 	uint16_t temper_fract;
 	float temper_float;
 
+	char ROM64_Rx[8] = {};
+	char ROM64_Prev[8] = {};
+	char branch_bits[8] = {};
+
 	RCC_Init();
 
 	GPIO_Init();
@@ -374,12 +509,34 @@ int main(void){
 	GPIOE -> BSRR |= GPIO_BSRR_BS15;
 
 	release_1wire();
-
+	
+	for (char i = 0; i < 8; i++) ROM64_Prev[i] = 0;	// clear ROM64_Prev
 	
 	while(1){
-		error_1wire = Read_ROM64(&family_byte, ser_number, &crc_rx);
-		if( error_1wire == OK_1WIRE ){
-			
+		//------ Scan 1-wire bus. Detect Device ROM64 ------------
+		if(!SearchROM(ROM64_Prev, ROM64_Rx, branch_bits)){
+			printf("ROM64 RX = ");
+			for(char i = 0; i < 8; i++){
+				printf("0x%X \t", ROM64_Rx[i]);
+			}
+			printf("\n");
+
+			printf("Branches = ");
+			for(char i = 0; i < 8; i++){
+				printf("0x%X \t", branch_bits[i]);
+			}
+			printf("\n");
+
+		}
+		else{
+			printf("---- ERROR: 1-Wire devices not found \n");
+		}
+		
+		
+		//error_1wire = Read_ROM64(&family_byte, ser_number, &crc_rx);
+		//if( error_1wire == OK_1WIRE ){
+		
+			/*
 			printf("+++ DS18B20 found +++ \n");
 			printf("+++ FAMILY_CODE = %X \n", family_byte);
 			printf("+++ SERIAL NUMBER = ");
@@ -388,18 +545,26 @@ int main(void){
 				printf("%X ", ser_number[i]);
 			}
 			printf("\n");
-			//printf("+++ CRC RX = %X \n", crc_rx);
+			*/
+			
+		//}
+		//else{
+		//	printf("---- ERROR: 1-Wire DS18B20 not found \n");
+		//}
 
-		}
-		else{
-			printf("---- ERROR: 1-Wire DS18B20 not found \n");
-		}
+
+		
 		
 		//------- CONFIG settings for DS18B20 ----------
 		scratch_mem[0] = 0x64;			// TH = 0x64 = 100	 
 		scratch_mem[1] = 0x0A;			// TL = 0x0A = 10
 		scratch_mem[2] = 0x1F;			// CONFIG = 0x1F; 9-bit temperature format
 		
+
+
+		
+		/*
+		//------- config, start temper conversion, read temperature --------
 		WriteScratch(scratch_mem);	// write config scratchpad 
 
 		Convert_Temperature(); // convert_t
@@ -429,6 +594,8 @@ int main(void){
 			temper_float = (float)temper / 16;
 			printf("=== Temper float = %f \n", temper_float);
 		}
+
+		*/
 		
 	}	// while(1)
 
