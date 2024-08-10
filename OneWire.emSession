@@ -1,7 +1,11 @@
 <!DOCTYPE CrossStudio_Session_File>
 <session>
  <Bookmarks/>
- <Breakpoints groups="Breakpoints" active_group="Breakpoints"/>
+ <Breakpoints groups="Breakpoints" active_group="Breakpoints">
+  <BreakpointListItem trigger="" line="486" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="2" filename="main.c" useHWbreakpoint="false"/>
+  <BreakpointListItem trigger="" line="612" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="2" filename="main.c" useHWbreakpoint="false"/>
+  <BreakpointListItem trigger="" line="793" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="2" filename="main.c" useHWbreakpoint="false"/>
+ </Breakpoints>
  <ExecutionProfileWindow/>
  <FrameBufferWindow>
   <FrameBufferWindow bufferHeight="-1" addressSpace="" addressText="" bufferWidth="-1"/>
@@ -50,6 +54,7 @@
   <ProjectSessionItem path="OneWire"/>
   <ProjectSessionItem path="OneWire;OneWire"/>
   <ProjectSessionItem path="OneWire;OneWire;Source Files"/>
+  <ProjectSessionItem path="OneWire;OneWire;System Files"/>
  </Project>
  <Register1>
   <RegisterWindow visibleNodes="CPU - Current Context/r0;CPU - Current Context/r1;CPU - Current Context/r2;CPU - Current Context/r3;CPU - Current Context/r4;CPU - Current Context/r5;CPU - Current Context/r6;CPU - Current Context/r7;CPU - Current Context/r8;CPU - Current Context/r9;CPU - Current Context/r10;CPU - Current Context/r11;CPU - Current Context/r12;CPU - Current Context/sp(r13);CPU - Current Context/lr(r14);CPU - Current Context/pc(r15);CPU - Current Context/apsr;CPU/r0;CPU/r1;CPU/r2;CPU/r3;CPU/r4;CPU/r5;CPU/r6;CPU/r7;CPU/r8;CPU/r9;CPU/r10;CPU/r11;CPU/r12;CPU/sp(r13);CPU/lr(r14);CPU/pc(r15);CPU/xpsr;CPU/MSP;CPU/PSP;CPU/PRIMASK;CPU/BASEPRI;CPU/FAULTMASK;CPU/CONTROL;CPU/internal" binaryNodes="" asciiNodes="" openNodes="CPU - Current Context" name="Executable_1" decimalNodes="" octalNodes="" unsignedNodes=""/>
@@ -101,6 +106,12 @@
   <Watches active="1" update="Never">
    <Watchpoint expression="rx_bits" name="rx_bits" radix="-1" linenumber="360" filename="main.c"/>
    <Watchpoint expression="bit_num" name="bit_num" radix="-1" linenumber="359" filename="main.c"/>
+   <Watchpoint expression="byte" name="byte" radix="-1" linenumber="430" filename="main.c"/>
+   <Watchpoint expression="bit" name="bit" radix="-1" linenumber="435" filename="main.c"/>
+   <Watchpoint expression="branches_byte" name="branches_byte" radix="-1" linenumber="433" filename="main.c"/>
+   <Watchpoint expression="branches" name="branches" radix="-1" linenumber="433" filename="main.c"/>
+   <Watchpoint expression="prevROM_byte" name="prevROM_byte" radix="-1" linenumber="479" filename="main.c"/>
+   <Watchpoint expression="byte_num" name="byte_num" radix="-1" linenumber="473" filename="main.c"/>
   </Watches>
  </Watch1>
  <Watch2>
@@ -113,9 +124,10 @@
   <Watches active="0" update="Never"/>
  </Watch4>
  <Files>
-  <SessionOpenFile windowGroup="DockEditLeft" x="10" y="449" useTextEdit="1" path="main.c" left="0" selected="1" top="419" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="611" useTextEdit="1" path="main.c" left="0" selected="1" top="592" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="22" y="0" useTextEdit="1" path="RCC_init.c" left="0" top="0" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="8" y="8547" useTextEdit="1" openedFrom="D:/Work/PCBteach/docs/02_MY_projects/MCU/02_Lessons_Projects_V2/11_1Wire/1WIRE_Lesson/main.c" path="STM32F4xx/Device/Include/stm32f407xx.h" left="0" top="8529" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="118" useTextEdit="1" path="STM32F4xx/Source/STM32F4xx_Startup.s" left="0" top="104" codecName="Default"/>
  </Files>
  <EMStudioWindow activeProject="OneWire" fileDialogDefaultFilter="*.c;*.h" autoConnectTarget="GDB Server" buildConfiguration="Debug" sessionSettings="" debugSearchFileMap="" fileDialogInitialDirectory="D:/Work/PCBteach/docs/02_MY_projects/MCU/02_Lessons_Projects_V2/11_1Wire/1WIRE_Lesson" debugSearchPath="" autoConnectCapabilities="1343"/>
 </session>
