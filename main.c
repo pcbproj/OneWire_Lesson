@@ -659,7 +659,7 @@ int main(void){
 
 	release_1wire();
 	
-	//------ Scan 1-wire bus. Detect Device ROM64 ------------
+	/********** Scan 1-wire bus. Detect Device ROM64 ***************
 	devices_found_number = Scan_1Wire(ROM_1wire_devices);
 
 	if(devices_found_number){
@@ -676,12 +676,12 @@ int main(void){
 	else {
 		printf("---- ERROR: 1-Wire bus have errors \n");
 	}
-	
+	***************************************************************/
 	
 	while(1){
 		
 
-		/********** ReadROM test **********************
+		/********** ReadROM ***********************/
 
 		error_1wire = Read_ROM64(&family_byte, ser_number, &crc_rx);
 		if( error_1wire == OK_1WIRE ){
@@ -700,13 +700,12 @@ int main(void){
 		else{
 			printf("---- ERROR: 1-Wire DS18B20 not found \n");
 		}
-		***********************************************/
+		/************************************************/
 
 
 
 		
-		/******************************
-		//------- CONFIG settings for DS18B20 ----------
+		/*************CONFIG settings for DS18B20 ******************/
 		scratch_mem[0] = 0x64;			// TH = 0x64 = 100	 
 		scratch_mem[1] = 0x0A;			// TL = 0x0A = 10
 		scratch_mem[2] = 0x1F;			// CONFIG = 0x1F; 9-bit temperature format
@@ -714,7 +713,7 @@ int main(void){
 		//------- config, start temper conversion, read temperature --------
 		WriteScratch(scratch_mem);	// write config scratchpad 
 
-		Convert_Temperature(); // convert_t
+		Convert_Temperature(); // convert temperature
 
 		while(us_count < SENSOR_CHECK_TIME_US){};
 		us_count = 0;
@@ -742,7 +741,7 @@ int main(void){
 			printf("=== Temper float = %f \n", temper_float);
 		}
 
-		*************************/
+		/**************************/
 		
 		// time delay 
 		while(us_count < SENSOR_CHECK_TIME_US){};
