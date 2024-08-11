@@ -350,8 +350,8 @@ uint8_t ScanROM(uint8_t ROM64_array_prev[],	// массив uint8_t ROM_64[8] с
 
 	if(!Start_1wire()){	
 		WriteByte_1wire(SEARCH_ROM);
-		printf("======= Searching ROM.... \n");
-		printf("========================== \n");
+		//printf("======= Searching ROM.... \n");
+		//printf("========================== \n");
 		Delay_us(100);
 		
 		for(uint8_t i = 0; i < ROM64_BIT_LEN; i++){
@@ -397,18 +397,10 @@ uint8_t ScanROM(uint8_t ROM64_array_prev[],	// массив uint8_t ROM_64[8] с
 
 			case ROM64_NO_DEVICE_CONDITION:
 				return NO_DEVICE_1WIRE;
-				//NULL;
 				break;
-		
 			
 			}	// switch (ROM64_BITS_CONDITION_MASK)
 		
-		/******** FOR DEBUG ONLY ********
-		printf("bit_num = %d, \t byte_num = %d, \t rx_bits = 0x%X, \t rx_byte_val = 0x%X \n", 
-				bit_num,		byte_number,		rx_bits,		rx_byte_val);
-
-		********************************/
-
 		}	// for ROM64_BITS_NUMBER
 
 		return OK_1WIRE;
@@ -424,8 +416,6 @@ uint8_t FindOnesBranches( uint8_t branches[],
 						uint8_t *bit_num,
 						uint8_t *byte_num ){
 	uint8_t branches_byte;
-	//uint8_t bit = 0;
-	//uint8_t byte = 0;
 
 	for(uint8_t byte = 0; byte < ROM64_BYTE_LEN; byte++){
 		
@@ -438,18 +428,12 @@ uint8_t FindOnesBranches( uint8_t branches[],
 					if(! (ROM64[ROM64_BYTE_LEN - byte - 1] & (1 << (BYTE_LEN - bit - 1)))){	// это новая ветка. 
 						*bit_num = (BYTE_LEN - bit - 1);
 						*byte_num = (ROM64_BYTE_LEN - byte - 1);
-						printf("=== Branch found ==== \n");
-						printf("== Byte number = %d \n", (ROM64_BYTE_LEN - byte - 1) );
-						printf("== Bit number = %d \n" , (BYTE_LEN - bit - 1) );
-			
+						
 						return 0;	// branch found
 					}
 				}
-				//bit++;
 			}	
 		}
-		//byte++;
-		//bit = 0;
 	}
 	return 1;	// no branches found
 }
@@ -480,64 +464,21 @@ void PrevROM64_Assemble(uint8_t ROM64[],		// ROM64[] массив с текущ�
 			}
 		}
 	}
-
-	printf("=== Prev_ROM64 assebmled: ");
-	for(uint8_t i = 0; i < ROM64_BYTE_LEN; i++) printf("0x%X \t",prevROM64[i]);
-	printf("\n");
-
 }
 
 
 
-/*
-	функция ищет в массиве branches[] единицы, начиная со старших байтов и старших битов
-	если есть единица, то проверяется значение бита в массиве ROM64 в этой же позиции.
-	если в ROM64 стоит 0, то в ROM_prev[] в эту позицию записывается 1. 
-	И в ROM_prev[] копируются все биты из ROM64[] до этой позиции.
-	После этой позиции в ROM_prev[] записываются нули.
-*/ 
-/*void BranchesScan( uint8_t *branches, uint8_t *ROM64, uint8_t *ROM_prev ){
-	uint8_t bit_number = 0, byte_number = 0;
-	 
-	
-	// ищем старший бит разночтения ROM64. 
-	branch_found = FindOnesBranches(branches,			
-						ROM64, 
-						&bit_number,
-						&byte_number
-						);
-	
 
-	// копируем в ROM_prev[] биты младше бита разночтения, бит разночтения ставим 1, старшие биты зануляем
-	if(branch_found) {
-		PrevROM64_Assemble(ROM64,			// ROM64[] массив с текущими значениями ROM64
-						bit_number,		// номер бита разночтения
-						byte_number,		// номер байта разночтения
-						ROM_prev 
-						);
-	}
-	else{
-		
-	}
-}
-
-*/
-
-
-
-/* Функция сканирования шины 1-wire для поиска всех устройств и их ROM64
- 
+/***************** 
+	Функция сканирования шины 1-wire для поиска всех устройств и их ROM64
 	первым находит устройство с минимальным значением кода ROM64
 	сортировка устройств по возрастанию кода ROM64 
 	
 	функция возвращает кол-во найденных устройств на шине 1-wire
 	а в выходном параметре ROMs_array[][] сохраняются все идентификаторы устройств на шине 1-wire
-*/
+****************/
 
 uint8_t Scan_1Wire(uint8_t ROMs_array[MAX_1WIRE_DEVICES_NUMBER][ROM64_BYTE_LEN]){	// двумерный массив с найденными ROM64 устройств
-	
-	//uint8_t ROM64_Rx[MAX_1WIRE_DEVICES_NUMBER][ROM64_BYTE_LEN] = {};	// нужно хранить всю последовательность ROM-кодов
-	//uint8_t branch_bits[MAX_1WIRE_DEVICES_NUMBER][ROM64_BYTE_LEN] = {};	// нужно хранить всю последовательность ветвлений в битах
 	
 	uint8_t dev_num = 0;
 	
@@ -573,32 +514,11 @@ uint8_t Scan_1Wire(uint8_t ROMs_array[MAX_1WIRE_DEVICES_NUMBER][ROM64_BYTE_LEN])
 
 			if(! err) {
 				
-				printf("ROM64 RX = ");
 				for(uint8_t i = 0; i < ROM64_BYTE_LEN; i++){
-					printf("0x%X \t", ROM64_Rx[i]);	// write ROM RX in USART1
-					
 					ROMs_array[dev_num][i] = ROM64_Rx[i];	// copy ROM64_RX into ROMs_array
 				}
 			
 				dev_num++;
-			
-				printf("\n");
-				
-
-				printf("PrevROM was =");
-				for(uint8_t i = 0; i < ROM64_BYTE_LEN; i++){
-					printf(" 0x%X \t", ROM64_Prev[i]);
-				}
-				printf("\n");
-				
-
-				printf("Branches = ");
-				for(uint8_t i = 0; i < ROM64_BYTE_LEN; i++){
-					printf("0x%X \t", branch_bits[i]);
-				}
-				printf("\n");
-				
-				printf("==== found 1-wire device number = %d \n" , dev_num);
 			
 				// ищем бит разночтения ROM64. 
 				branch_found = FindOnesBranches(branch_bits,			
@@ -608,7 +528,8 @@ uint8_t Scan_1Wire(uint8_t ROMs_array[MAX_1WIRE_DEVICES_NUMBER][ROM64_BYTE_LEN])
 									);
 				
 				// если найден бит разночтения. 
-				// То копируем в ROM_prev[] биты младше бита разночтения, бит разночтения ставим 1, старшие биты зануляем
+				// То копируем в ROM_prev[] биты младше бита разночтения, 
+				// бит разночтения ставим 1, старшие биты зануляем
 				if (! branch_found) {
 					PrevROM64_Assemble(ROM64_Rx,			// ROM64[] массив с текущими значениями ROM64
 									bit_number,		// номер бита разночтения
@@ -626,64 +547,11 @@ uint8_t Scan_1Wire(uint8_t ROMs_array[MAX_1WIRE_DEVICES_NUMBER][ROM64_BYTE_LEN])
 			}	// if(! err)
 		}  // while(! branch_found) 
 
-
-
-	/*******************************************
-	if(!ScanROM(ROM64_Prev, ROM64_Rx, branch_bits)){
-		printf("ROM64 RX = ");
-		for(uint8_t i = 0; i < ROM64_BYTE_LEN; i++){
-			printf("0x%X \t", ROM64_Rx[i]);
-		}
-		printf("\n");
-
-		printf("Branches = ");
-		for(uint8_t i = 0; i < ROM64_BYTE_LEN; i++){
-			printf("0x%X \t", branch_bits[i]);
-		}
-		printf("\n");
-
-		
-
-	}
-	else{
-		printf("---- ERROR: 1-Wire devices not found \n");
-	}
-	**********************************************/
 }
 
 
 
 
-/******* BAK function Scan_1Wire() *****************
-
-uint8_t Scan_1Wire(uint8_t ROMs_array[MAX_1WIRE_DEVICES_NUMBER][8]){	// двумерный массив с найденными ROM64 устройств
-	
-	uint8_t ROM64_Rx[ROM64_BYTE_LEN] = {};
-	uint8_t ROM64_Prev[ROM64_BYTE_LEN] = {};
-	uint8_t branch_bits[ROM64_BYTE_LEN] = {};
-	
-	for (uint8_t i = 0; i < ROM64_BYTE_LEN; i++) ROM64_Prev[i] = 0;	// clear ROM64_Prev
-
-	if(!ScanROM(ROM64_Prev, ROM64_Rx, branch_bits)){
-		printf("ROM64 RX = ");
-		for(uint8_t i = 0; i < ROM64_BYTE_LEN; i++){
-			printf("0x%X \t", ROM64_Rx[i]);
-		}
-		printf("\n");
-
-		printf("Branches = ");
-		for(uint8_t i = 0; i < ROM64_BYTE_LEN; i++){
-			printf("0x%X \t", branch_bits[i]);
-		}
-		printf("\n");
-
-	}
-	else{
-		printf("---- ERROR: 1-Wire devices not found \n");
-	}
-}
-
-*********************************/
 
 
 uint8_t ReadScratchpad(uint8_t scratch_array[]){
@@ -723,6 +591,10 @@ uint8_t Convert_Temperature(void){
 		return NO_DEVICE_1WIRE;
 	}
 }
+
+
+
+
 
 
 uint8_t WriteScratch(uint8_t tx_array[]){	// write only 3 byties from array [0 1 2 ] will be writed
@@ -768,6 +640,7 @@ int main(void){
 	uint16_t temper_fract;
 	float temper_float;
 	uint8_t ROM_1wire_devices[MAX_1WIRE_DEVICES_NUMBER][ROM64_BYTE_LEN] = {};	// двуменрый массив на 16 ROM64 
+	uint8_t devices_found_number = 0;
 	
 
 	RCC_Init();
@@ -786,42 +659,27 @@ int main(void){
 
 	release_1wire();
 	
+	//------ Scan 1-wire bus. Detect Device ROM64 ------------
+	devices_found_number = Scan_1Wire(ROM_1wire_devices);
+
+	if(devices_found_number){
+		printf("=== 1-Wire bus scanned ==== \n");
+		for(uint8_t dev_found_num = 0; dev_found_num < devices_found_number; dev_found_num++){
+			printf("sensor # %d ROM64 = ", (dev_found_num + 1));
+			
+			for( uint8_t rom_byte_num = 0; rom_byte_num < ROM64_BYTE_LEN; rom_byte_num++){
+				printf("0x%X \t", ROM_1wire_devices[dev_found_num][rom_byte_num]);
+			}
+			printf("\n");
+		}
+	}
+	else {
+		printf("---- ERROR: 1-Wire bus have errors \n");
+	}
 	
 	
 	while(1){
-		//------ Scan 1-wire bus. Detect Device ROM64 ------------
-		if(Scan_1Wire(ROM_1wire_devices)){
-			printf("=== 1-Wire bus scanned ==== \n");
-		}
-		else {
-			printf("---- ERROR: 1-Wire bus have errors \n");
-		}
-
 		
-		
-		/*************** Scan ROM test *****************
-
-		if(!ScanROM(ROM64_Prev, ROM64_Rx, branch_bits)){
-			printf("ROM64 RX = ");
-			for(uint8_t i = 0; i < 8; i++){
-				printf("0x%X \t", ROM64_Rx[i]);
-			}
-			printf("\n");
-
-			printf("Branches = ");
-			for(uint8_t i = 0; i < 8; i++){
-				printf("0x%X \t", branch_bits[i]);
-			}
-			printf("\n");
-
-		}
-		else{
-			printf("---- ERROR: 1-Wire devices not found \n");
-		}
-		******************************************************/
-
-
-
 
 		/********** ReadROM test **********************
 
