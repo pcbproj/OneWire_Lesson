@@ -51,7 +51,7 @@
 #define ROM64_NO_DEVICE_CONDITION	0x03
 #define ROM64_BITS_CONDITION_MASK	0x03
 
-#define MAX_1WIRE_DEVICES_NUMBER	16
+#define MAX_1WIRE_DEVICES_NUMBER	128
 
 #define ROM64_BYTE_LEN				8
 #define ROM64_BIT_LEN				64
@@ -639,7 +639,7 @@ int main(void){
 	uint16_t temper;
 	uint16_t temper_fract;
 	float temper_float;
-	uint8_t ROM_1wire_devices[MAX_1WIRE_DEVICES_NUMBER][ROM64_BYTE_LEN] = {};	// двуменрый массив на 16 ROM64 
+	uint8_t ROM_1wire_devices[MAX_1WIRE_DEVICES_NUMBER][ROM64_BYTE_LEN] = {};	// двуменрый массив на 128 ROM64 
 	uint8_t devices_found_number = 0;
 	
 
