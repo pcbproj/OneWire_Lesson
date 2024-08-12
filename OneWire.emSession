@@ -1,11 +1,7 @@
 <!DOCTYPE CrossStudio_Session_File>
 <session>
  <Bookmarks/>
- <Breakpoints groups="Breakpoints" active_group="Breakpoints">
-  <BreakpointListItem trigger="" line="486" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="2" filename="main.c" useHWbreakpoint="false"/>
-  <BreakpointListItem trigger="" line="612" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="2" filename="main.c" useHWbreakpoint="false"/>
-  <BreakpointListItem trigger="" line="793" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="2" filename="main.c" useHWbreakpoint="false"/>
- </Breakpoints>
+ <Breakpoints groups="Breakpoints" active_group="Breakpoints"/>
  <ExecutionProfileWindow/>
  <FrameBufferWindow>
   <FrameBufferWindow bufferHeight="-1" addressSpace="" addressText="" bufferWidth="-1"/>
@@ -104,14 +100,14 @@
  </TraceWindow>
  <Watch1>
   <Watches active="1" update="Never">
-   <Watchpoint expression="rx_bits" name="rx_bits" radix="-1" linenumber="360" filename="main.c"/>
-   <Watchpoint expression="bit_num" name="bit_num" radix="-1" linenumber="359" filename="main.c"/>
-   <Watchpoint expression="byte" name="byte" radix="-1" linenumber="430" filename="main.c"/>
-   <Watchpoint expression="bit" name="bit" radix="-1" linenumber="435" filename="main.c"/>
-   <Watchpoint expression="branches_byte" name="branches_byte" radix="-1" linenumber="433" filename="main.c"/>
-   <Watchpoint expression="branches" name="branches" radix="-1" linenumber="433" filename="main.c"/>
-   <Watchpoint expression="prevROM_byte" name="prevROM_byte" radix="-1" linenumber="479" filename="main.c"/>
-   <Watchpoint expression="byte_num" name="byte_num" radix="-1" linenumber="473" filename="main.c"/>
+   <Watchpoint expression="rx_bits" name="rx_bits" radix="-1" linenumber="298" filename="main.c"/>
+   <Watchpoint expression="bit_num" name="bit_num" radix="-1" linenumber="297" filename="main.c"/>
+   <Watchpoint expression="byte" name="byte" radix="-1" linenumber="358" filename="main.c"/>
+   <Watchpoint expression="bit" name="bit" radix="-1" linenumber="363" filename="main.c"/>
+   <Watchpoint expression="branches_byte" name="branches_byte" radix="-1" linenumber="361" filename="main.c"/>
+   <Watchpoint expression="branches" name="branches" radix="-1" linenumber="361" filename="main.c"/>
+   <Watchpoint expression="prevROM_byte" name="prevROM_byte" radix="-1" linenumber="399" filename="main.c"/>
+   <Watchpoint expression="byte_num" name="byte_num" radix="-1" linenumber="393" filename="main.c"/>
   </Watches>
  </Watch1>
  <Watch2>
@@ -124,7 +120,7 @@
   <Watches active="0" update="Never"/>
  </Watch4>
  <Files>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="611" useTextEdit="1" path="main.c" left="0" selected="1" top="592" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="1" y="226" useTextEdit="1" path="main.c" left="0" selected="1" top="363" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="22" y="0" useTextEdit="1" path="RCC_init.c" left="0" top="0" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="8" y="8547" useTextEdit="1" openedFrom="D:/Work/PCBteach/docs/02_MY_projects/MCU/02_Lessons_Projects_V2/11_1Wire/1WIRE_Lesson/main.c" path="STM32F4xx/Device/Include/stm32f407xx.h" left="0" top="8529" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="118" useTextEdit="1" path="STM32F4xx/Source/STM32F4xx_Startup.s" left="0" top="104" codecName="Default"/>

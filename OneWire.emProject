@@ -71,7 +71,10 @@
       gdb_server_port="3333"
       gdb_server_register_access="General and Individual"
       gdb_server_reset_command="reset halt"
-      gdb_server_type="OpenOCD" />
+      gdb_server_type="OpenOCD"
+      linker_printf_wchar_enabled="Yes"
+      linker_scanf_character_group_matching_enabled="Yes"
+      linker_scanf_fp_enabled="Yes" />
   </project>
   <configuration
     Name="Debug"
