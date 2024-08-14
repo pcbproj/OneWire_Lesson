@@ -207,6 +207,7 @@ uint8_t ReadByte_1wire(void){
 	data_bit_in - это младший бит в байте. 
 	В CRC в младший бит задвигаются байты входных данных начиная с младшего бита.
 */
+
 uint8_t CRC_Calc(uint8_t mass[], uint8_t mass_size, uint8_t POLY){
 	uint8_t crc = 0 , crc_out = 0;
 	uint8_t in_data;
@@ -229,8 +230,7 @@ uint8_t CRC_Calc(uint8_t mass[], uint8_t mass_size, uint8_t POLY){
 	}
 	return crc_out;
 }	
-	
-	
+
 
 
 

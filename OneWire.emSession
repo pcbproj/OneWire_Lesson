@@ -120,7 +120,7 @@
   <Watches active="0" update="Never"/>
  </Watch4>
  <Files>
-  <SessionOpenFile windowGroup="DockEditLeft" x="1" y="226" useTextEdit="1" path="main.c" left="0" selected="1" top="363" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="234" useTextEdit="1" path="main.c" left="0" selected="1" top="181" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="22" y="0" useTextEdit="1" path="RCC_init.c" left="0" top="0" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="8" y="8547" useTextEdit="1" openedFrom="D:/Work/PCBteach/docs/02_MY_projects/MCU/02_Lessons_Projects_V2/11_1Wire/1WIRE_Lesson/main.c" path="STM32F4xx/Device/Include/stm32f407xx.h" left="0" top="8529" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="118" useTextEdit="1" path="STM32F4xx/Source/STM32F4xx_Startup.s" left="0" top="104" codecName="Default"/>
